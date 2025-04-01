@@ -9,11 +9,10 @@ namespace WebApiMyFinances.WebApi.Mapping
     {
         public DefaultMappingProfile()
         {
-            CreateMap<UserAPI, DTOUserAPIRegister>()
-                .ReverseMap();
+            CreateMap<DTOUserAPIRegister, UserAPI>()
+                .ForMember(dest => dest.Role, opt => opt.Ignore())
+                .ForMember(dest => dest.RoleId, opt => opt.Ignore());
             CreateMap<UserAPI, DTOUserApiLogin>()
-                .ReverseMap();
-            CreateMap<UserAPI, DTOUserAPIJwt>()
                 .ReverseMap();
             CreateMap<User, DTOUserGet>()
                 .ReverseMap();
@@ -21,6 +20,10 @@ namespace WebApiMyFinances.WebApi.Mapping
                 .ReverseMap();
             CreateMap<User, DTOUserEdit>()
                 .ReverseMap();
+            CreateMap<UserApiRole, DTOUserApiRole>()
+                .ReverseMap();
+            CreateMap<UserAPI, DTOUserAPIJwt>()
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role));
         }
     }
 }

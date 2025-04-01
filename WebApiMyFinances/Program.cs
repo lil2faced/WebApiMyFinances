@@ -17,6 +17,10 @@ namespace WebApiMyFinances
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Host.UseConsoleLifetime();
+            builder.Logging.AddConsole();
+            builder.Logging.AddDebug();
+
             var configuration = builder.Configuration;
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -47,7 +51,7 @@ namespace WebApiMyFinances
                         }
                     };
                 });
-            
+
             builder.Services.AddAuthorization();
 
             builder.Services.AddControllers();
@@ -56,12 +60,9 @@ namespace WebApiMyFinances
             builder.Services.AddAutoMapper(typeof(DefaultMappingProfile));
 
             builder.Services.AddScoped<IUserApiService, UserApiService>();
-            builder.Services.AddTransient<UserApiService>();
             builder.Services.AddScoped<IJwtProvider, JwtProvider>();
-            builder.Services.AddTransient<JwtProvider>();
             builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddTransient<UserService>();
-
+            builder.Services.AddScoped<IUserApiRoleService, UserApiRoleService>();
             builder.Services.AddDbContext<DatabaseContext>();
 
             var app = builder.Build();
@@ -73,15 +74,15 @@ namespace WebApiMyFinances
 
             app.UseMiddleware<GlobalExceptionMiddleware>();
 
-
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
             app.UseRouting();
             app.UseHttpsRedirection();
-            app.UseAuthentication(); 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
