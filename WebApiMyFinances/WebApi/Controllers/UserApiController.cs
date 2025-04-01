@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebApiMyFinances.Core.Interfaces;
 using WebApiMyFinances.Core.Services;
 using WebApiMyFinances.WebApi.DTO;
 
@@ -8,8 +9,8 @@ namespace WebApiMyFinances.WebApi.Controllers
     [ApiController]
     public class UserApiController : ControllerBase
     {
-        private readonly UserApiService _userApiService;
-        public UserApiController(UserApiService userApiService)
+        private readonly IUserApiService _userApiService;
+        public UserApiController(IUserApiService userApiService)
         {
             _userApiService = userApiService;
         }

@@ -14,12 +14,14 @@ namespace WebApiMyFinances.Core.Services
         private readonly DatabaseContext _databaseContext;
         private readonly IMapper _mapper;
         private readonly IJwtProvider _jwtProvider;
+        private readonly ILogger<UserApiService> _logger;
 
-        public UserApiService(DatabaseContext databaseContext,IMapper mapper, IJwtProvider jwtProvider)
+        public UserApiService(DatabaseContext databaseContext,IMapper mapper, IJwtProvider jwtProvider, ILogger<UserApiService> logger)
         {
             _databaseContext = databaseContext;
             _jwtProvider = jwtProvider;
             _mapper = mapper;
+            _logger = logger;
         } 
 
         public async Task<string> Login(DTOUserApiLogin user, CancellationToken cancellationToken)
@@ -39,6 +41,8 @@ namespace WebApiMyFinances.Core.Services
 
             var jwtToken = _jwtProvider.GenerateToken(_mapper.Map<DTOUserAPIJwt>(userApi));
 
+            _logger.LogInformation($"Пользователь API {user.Email} вошел в систему, токен был сгенерирован");
+
             return jwtToken;
         }
 
@@ -47,28 +51,26 @@ namespace WebApiMyFinances.Core.Services
             if (user is null)
                 throw new ArgumentNullException("В качестве аргумента получен NULL");
 
-            // Проверяем существование пользователя
             bool userExists = await _databaseContext.ApiUsers
                 .AnyAsync(p => p.Email == user.Email, cancellationToken);
 
             if (userExists)
                 throw new BadRequestException("Такой пользователь уже существует");
 
-            // Ищем роль в базе данных
             var role = await _databaseContext.ApiRoles
                 .FirstOrDefaultAsync(r => r.Role == user.RoleName, cancellationToken)
                 ?? throw new NotFoundException($"Роль '{user.RoleName}' не найдена");
 
-            // Создаем пользователя
             var newUser = new UserAPI
             {
                 Email = user.Email,
                 Password = user.Password,
-                RoleId = role.Id // Устанавливаем связь через RoleId
+                RoleId = role.Id 
             };
-
             await _databaseContext.ApiUsers.AddAsync(newUser, cancellationToken);
             await _databaseContext.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation($"Создан новый пользователь API: {user.Email} с ролью {user.RoleName}");
         }
     }
 }

@@ -14,10 +14,12 @@ namespace WebApiMyFinances.Core.Services
     {
         private readonly IMapper _mapper;
         private readonly DatabaseContext _dbContext;
-        public UserApiRoleService(IMapper mapper, DatabaseContext databaseContext)
+        private readonly ILogger<UserApiRoleService> _logger;
+        public UserApiRoleService(IMapper mapper, DatabaseContext databaseContext, ILogger<UserApiRoleService> logger)
         {
             _dbContext = databaseContext;
             _mapper = mapper;
+            _logger = logger;
         }
         public async Task DeleteRole(string role, CancellationToken cancellationToken)
         {
@@ -32,6 +34,7 @@ namespace WebApiMyFinances.Core.Services
                 ?? throw new NotFoundException("Роль не найдена");
             _dbContext.ApiRoles.Remove(temp);
             await _dbContext.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation($"Роль {role} была удалена");
         }
 
         public async Task EditRole(string roleToEdit, DTOUserApiRole role, CancellationToken cancellationToken)
@@ -48,6 +51,7 @@ namespace WebApiMyFinances.Core.Services
             _mapper.Map(role, existingUser);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation($"Роль {role} была отредактирована");
         }
 
         public async Task<IEnumerable<DTOUserApiRole>> GetAllRoles(CancellationToken cancellationToken)
@@ -57,7 +61,7 @@ namespace WebApiMyFinances.Core.Services
             var roles = await _dbContext.ApiRoles
                 .ProjectTo<DTOUserApiRole>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
-
+            _logger.LogInformation($"Запрос на получение всех ролей");
             return roles;
         }
 
@@ -79,6 +83,7 @@ namespace WebApiMyFinances.Core.Services
 
             await _dbContext.AddAsync(role);
             await _dbContext.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation($"Роль {role.Role} была добавлена");
         }
     }
 }
