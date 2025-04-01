@@ -27,7 +27,11 @@ namespace WebApiMyFinances.Core.Services
             if (user is null)
                 throw new ArgumentNullException("В качестве аргумента получен NULL");
 
-            var userApi = await _databaseContext.APIUsers.Where(p => p.Email == user.Email).FirstOrDefaultAsync()
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var userApi = await _databaseContext.ApiUsers
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Email == user.Email, cancellationToken)
                 ?? throw new NotFoundException("Пользователь не найден");
 
             if (userApi.Password != user.Password)
@@ -43,15 +47,28 @@ namespace WebApiMyFinances.Core.Services
             if (user is null)
                 throw new ArgumentNullException("В качестве аргумента получен NULL");
 
-            bool IsHave = await _databaseContext.APIUsers.AnyAsync(p => p.Email == user.Email);
+            // Проверяем существование пользователя
+            bool userExists = await _databaseContext.ApiUsers
+                .AnyAsync(p => p.Email == user.Email, cancellationToken);
 
-            if (IsHave)
+            if (userExists)
                 throw new BadRequestException("Такой пользователь уже существует");
 
-            UserAPI u = _mapper.Map<UserAPI>(user);
+            // Ищем роль в базе данных
+            var role = await _databaseContext.ApiRoles
+                .FirstOrDefaultAsync(r => r.Role == user.RoleName, cancellationToken)
+                ?? throw new NotFoundException($"Роль '{user.RoleName}' не найдена");
 
-            await _databaseContext.APIUsers.AddAsync(u);
-            await _databaseContext.SaveChangesAsync();
+            // Создаем пользователя
+            var newUser = new UserAPI
+            {
+                Email = user.Email,
+                Password = user.Password,
+                RoleId = role.Id // Устанавливаем связь через RoleId
+            };
+
+            await _databaseContext.ApiUsers.AddAsync(newUser, cancellationToken);
+            await _databaseContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

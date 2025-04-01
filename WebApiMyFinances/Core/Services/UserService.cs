@@ -26,12 +26,12 @@ namespace WebApiMyFinances.Core.Services
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            bool IsHave = await _databaseContext.Users.AnyAsync(p => p.Email == email);
+            bool IsHave = await _databaseContext.Users.AnyAsync(p => p.Email == email, cancellationToken);
 
             if (!IsHave)
                 throw new NotFoundException("Пользователь не найден");
 
-            var temp = await _databaseContext.Users.FirstOrDefaultAsync(p => p.Email == email)
+            var temp = await _databaseContext.Users.FirstOrDefaultAsync(p => p.Email == email, cancellationToken)
                 ??throw new NotFoundException("Пользователь не найден");
             _databaseContext.Users.Remove(temp);
             await _databaseContext.SaveChangesAsync(cancellationToken);
@@ -86,14 +86,14 @@ namespace WebApiMyFinances.Core.Services
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            bool IsHave = await _databaseContext.Users.AnyAsync(p => p.Email == userSet.Email);
+            bool IsHave = await _databaseContext.Users.AnyAsync(p => p.Email == userSet.Email, cancellationToken);
 
             if (IsHave)
                 throw new BadRequestException("Такой пользователь уже существует");
 
             User user = _mapper.Map<User>(userSet);
 
-            await _databaseContext.AddAsync(user);
+            await _databaseContext.AddAsync(user, cancellationToken);
             await _databaseContext.SaveChangesAsync(cancellationToken);
         }
     }

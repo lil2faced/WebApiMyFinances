@@ -29,7 +29,11 @@ namespace WebApiMyFinances.Security.Jwt
 
         public string GenerateToken(DTOUserAPIJwt user)
         {
-            Claim[] claims = [new("userId", user.Id.ToString())];
+            var claims = new List<Claim>{
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Role, user.Role.Role.ToString())
+            };
+
             var SecretKeyGenerated = new SigningCredentials(
             new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(_sectretKey)),

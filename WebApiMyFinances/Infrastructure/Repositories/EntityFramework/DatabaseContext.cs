@@ -13,12 +13,12 @@ namespace WebApiMyFinances.Infrastructure.Repositories.EntityFramework
                 ?? throw new Exception("Строка подключения к бд не определена");
             Database.EnsureCreated();
         }
-        public DbSet<UserAPI> APIUsers { get; set; }
+        public DbSet<UserAPI> ApiUsers { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UserApiRole> ApiRoles { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseNpgsql(_ConnectionString);
-            optionsBuilder.LogTo(Console.WriteLine);
         }
     }
 }

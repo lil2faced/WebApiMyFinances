@@ -27,6 +27,8 @@ namespace WebApiMyFinances.WebApi.Controllers
         [Route("/Register")]
         public async Task<ActionResult> Register([FromBody] DTOUserAPIRegister user)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var cts = new CancellationTokenSource();
             await _userApiService.Register(user, cts.Token);
             return Ok();

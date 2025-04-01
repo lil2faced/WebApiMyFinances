@@ -61,6 +61,8 @@ namespace WebApiMyFinances
             builder.Services.AddTransient<JwtProvider>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddTransient<UserService>();
+            builder.Services.AddScoped<IUserApiRoleService, UserApiRoleService>();
+            builder.Services.AddTransient<UserApiRoleService>();
 
             builder.Services.AddDbContext<DatabaseContext>();
 
