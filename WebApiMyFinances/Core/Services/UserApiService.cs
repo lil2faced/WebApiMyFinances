@@ -20,7 +20,7 @@ namespace WebApiMyFinances.Core.Services
             _databaseContext = databaseContext;
             _jwtProvider = jwtProvider;
             _mapper = mapper;
-        }
+        } 
 
         public async Task<string> Login(DTOUserApiLogin user, CancellationToken cancellationToken)
         {
