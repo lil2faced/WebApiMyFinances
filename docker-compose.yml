@@ -1,0 +1,6 @@
+services:
+  backend:
+    image: ${DOCKER_REGISTRY-}webapimyfinances
+    build:
+      context: .
+      dockerfile: WebApiMyFinances/Dockerfile

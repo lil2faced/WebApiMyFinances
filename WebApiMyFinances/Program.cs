@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebApiMyFinances.Core.Interfaces;
@@ -18,19 +19,24 @@ namespace WebApiMyFinances
 
             var configuration = builder.Configuration;
 
-            string secretKey = configuration["AuthOptions:Key"]
-                ??throw new Exception("Секретный ключ не определен");
-
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
+                    string secretKey = configuration["AuthOptions:Key"] ??
+                            throw new Exception("Секретный ключ не определен");
+                    string issuer = configuration["AuthOptions:Issuer"] ??
+                            throw new Exception("Секретный ключ не определен");
+                    string audience = configuration["AuthOptions:Audience"] ??
+                            throw new Exception("Секретный ключ не определен");
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                        ValidIssuer = issuer,
+                        ValidAudience = audience
                     };
                     options.Events = new JwtBearerEvents()
                     {
@@ -41,7 +47,7 @@ namespace WebApiMyFinances
                         }
                     };
                 });
-
+            
             builder.Services.AddAuthorization();
 
             builder.Services.AddControllers();
@@ -49,29 +55,35 @@ namespace WebApiMyFinances
             builder.Services.AddSwaggerGen();
             builder.Services.AddAutoMapper(typeof(DefaultMappingProfile));
 
-            builder.Services.AddTransient<JwtProvider>();
             builder.Services.AddScoped<IUserApiService, UserApiService>();
             builder.Services.AddTransient<UserApiService>();
             builder.Services.AddScoped<IJwtProvider, JwtProvider>();
             builder.Services.AddTransient<JwtProvider>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddTransient<UserService>();
 
             builder.Services.AddDbContext<DatabaseContext>();
 
             var app = builder.Build();
 
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
             app.UseMiddleware<GlobalExceptionMiddleware>();
+
 
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseRouting();
             app.UseHttpsRedirection();
+            app.UseAuthentication(); 
+            app.UseAuthorization();
 
-            app.UseAuthorization();
-            app.UseAuthorization();
-            
             app.MapControllers();
 
             app.Run();
