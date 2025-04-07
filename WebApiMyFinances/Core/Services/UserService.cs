@@ -34,7 +34,7 @@ namespace WebApiMyFinances.Core.Services
                 throw new NotFoundException("Пользователь не найден");
 
             var temp = await _databaseContext.Users.FirstOrDefaultAsync(p => p.Email == email, cancellationToken)
-                ??throw new NotFoundException("Пользователь не найден");
+                ?? throw new NotFoundException("Пользователь не найден");
             _databaseContext.Users.Remove(temp);
             await _databaseContext.SaveChangesAsync(cancellationToken);
             _logger.LogInformation($"Пользователь {email} был удален");
@@ -48,7 +48,7 @@ namespace WebApiMyFinances.Core.Services
             cancellationToken.ThrowIfCancellationRequested();
 
             User existingUser = await _databaseContext.Users
-                .FirstOrDefaultAsync(p => p.Email == email, cancellationToken)??
+                .FirstOrDefaultAsync(p => p.Email == email, cancellationToken) ??
                 throw new NotFoundException("Пользователь не найден");
 
             _mapper.Map(userEdit, existingUser);

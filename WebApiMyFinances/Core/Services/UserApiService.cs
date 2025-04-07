@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using WebApiMyFinances.Core.Interfaces;
 using WebApiMyFinances.Infrastructure.Repositories.EntityFramework;
 using WebApiMyFinances.Infrastructure.Repositories.EntityFramework.Entities.Security;
-using WebApiMyFinances.Security.Jwt;
 using WebApiMyFinances.Shared.Exceptions;
 using WebApiMyFinances.WebApi.DTO;
 
@@ -15,14 +14,16 @@ namespace WebApiMyFinances.Core.Services
         private readonly IMapper _mapper;
         private readonly IJwtProvider _jwtProvider;
         private readonly ILogger<UserApiService> _logger;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public UserApiService(DatabaseContext databaseContext,IMapper mapper, IJwtProvider jwtProvider, ILogger<UserApiService> logger)
+        public UserApiService(DatabaseContext databaseContext, IMapper mapper, IJwtProvider jwtProvider, ILogger<UserApiService> logger, IPasswordHasher passwordHasher)
         {
             _databaseContext = databaseContext;
             _jwtProvider = jwtProvider;
             _mapper = mapper;
             _logger = logger;
-        } 
+            _passwordHasher = passwordHasher;
+        }
 
         public async Task<string> Login(DTOUserApiLogin user, CancellationToken cancellationToken)
         {
@@ -36,7 +37,8 @@ namespace WebApiMyFinances.Core.Services
                 .FirstOrDefaultAsync(u => u.Email == user.Email, cancellationToken)
                 ?? throw new NotFoundException("Пользователь не найден");
 
-            if (userApi.Password != user.Password)
+            // Сравниваем хеши паролей
+            if (!_passwordHasher.VerifyHashedPassword(userApi.Password, user.Password))
                 throw new NotAuthenticationException("Пользователь не аутентифицирован");
 
             var jwtToken = _jwtProvider.GenerateToken(_mapper.Map<DTOUserAPIJwt>(userApi));
@@ -61,11 +63,14 @@ namespace WebApiMyFinances.Core.Services
                 .FirstOrDefaultAsync(r => r.Role == user.RoleName, cancellationToken)
                 ?? throw new NotFoundException($"Роль '{user.RoleName}' не найдена");
 
+            // Хешируем пароль перед сохранением
+            var hashedPassword = _passwordHasher.HashPassword(user.Password);
+
             var newUser = new UserAPI
             {
                 Email = user.Email,
-                Password = user.Password,
-                RoleId = role.Id 
+                Password = hashedPassword,
+                RoleId = role.Id
             };
             await _databaseContext.ApiUsers.AddAsync(newUser, cancellationToken);
             await _databaseContext.SaveChangesAsync(cancellationToken);

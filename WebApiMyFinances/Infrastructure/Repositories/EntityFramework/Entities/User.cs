@@ -1,8 +1,11 @@
-﻿namespace WebApiMyFinances.Infrastructure.Repositories.EntityFramework.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace WebApiMyFinances.Infrastructure.Repositories.EntityFramework.Entities
 {
     public class User
     {
-        public int Id { get; set; }
+        [Key]
+        public int Guid { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
     }

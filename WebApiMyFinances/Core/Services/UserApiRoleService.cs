@@ -3,7 +3,6 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using WebApiMyFinances.Core.Interfaces;
 using WebApiMyFinances.Infrastructure.Repositories.EntityFramework;
-using WebApiMyFinances.Infrastructure.Repositories.EntityFramework.Entities;
 using WebApiMyFinances.Infrastructure.Repositories.EntityFramework.Entities.Security;
 using WebApiMyFinances.Shared.Exceptions;
 using WebApiMyFinances.WebApi.DTO;

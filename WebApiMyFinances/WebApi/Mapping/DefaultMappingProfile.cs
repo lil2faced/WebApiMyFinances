@@ -5,7 +5,7 @@ using WebApiMyFinances.WebApi.DTO;
 
 namespace WebApiMyFinances.WebApi.Mapping
 {
-    public class DefaultMappingProfile : Profile 
+    public class DefaultMappingProfile : Profile
     {
         public DefaultMappingProfile()
         {

@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebApiMyFinances.Core.Interfaces;
 using WebApiMyFinances.Core.Services;
 using WebApiMyFinances.Infrastructure.Repositories.EntityFramework;
+using WebApiMyFinances.Security;
 using WebApiMyFinances.Security.Jwt;
 using WebApiMyFinances.Shared.Middlewares;
 using WebApiMyFinances.WebApi.Mapping;
@@ -58,11 +58,12 @@ namespace WebApiMyFinances
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddAutoMapper(typeof(DefaultMappingProfile));
-
+            builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             builder.Services.AddScoped<IUserApiService, UserApiService>();
             builder.Services.AddScoped<IJwtProvider, JwtProvider>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IUserApiRoleService, UserApiRoleService>();
+
             builder.Services.AddDbContext<DatabaseContext>();
 
             var app = builder.Build();

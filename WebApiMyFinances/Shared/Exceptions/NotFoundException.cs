@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
-
-namespace WebApiMyFinances.Shared.Exceptions
+﻿namespace WebApiMyFinances.Shared.Exceptions
 {
     public class NotFoundException : Exception
     {
