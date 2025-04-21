@@ -20,6 +20,7 @@ namespace WebApiMyFinances.Core.Services
             _mapper = mapper;
             _logger = logger;
         }
+
         public async Task DeleteRole(string role, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -31,8 +32,10 @@ namespace WebApiMyFinances.Core.Services
 
             var temp = await _dbContext.ApiRoles.FirstOrDefaultAsync(p => p.Role == role, cancellationToken)
                 ?? throw new NotFoundException("Роль не найдена");
+
             _dbContext.ApiRoles.Remove(temp);
             await _dbContext.SaveChangesAsync(cancellationToken);
+
             _logger.LogInformation($"Роль {role} была удалена");
         }
 
@@ -50,6 +53,7 @@ namespace WebApiMyFinances.Core.Services
             _mapper.Map(role, existingUser);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
+
             _logger.LogInformation($"Роль {role} была отредактирована");
         }
 
@@ -60,7 +64,9 @@ namespace WebApiMyFinances.Core.Services
             var roles = await _dbContext.ApiRoles
                 .ProjectTo<DTOUserApiRole>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
+
             _logger.LogInformation($"Запрос на получение всех ролей");
+
             return roles;
         }
 
@@ -82,6 +88,7 @@ namespace WebApiMyFinances.Core.Services
 
             await _dbContext.AddAsync(role);
             await _dbContext.SaveChangesAsync(cancellationToken);
+
             _logger.LogInformation($"Роль {role.Role} была добавлена");
         }
     }

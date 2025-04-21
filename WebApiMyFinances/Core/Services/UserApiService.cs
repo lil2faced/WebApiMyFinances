@@ -40,9 +40,9 @@ namespace WebApiMyFinances.Core.Services
             // Сравниваем хеши паролей
             if (!_passwordHasher.VerifyHashedPassword(userApi.Password, user.Password))
                 throw new NotAuthenticationException("Пользователь не аутентифицирован");
-
+            
             var jwtToken = _jwtProvider.GenerateToken(_mapper.Map<DTOUserAPIJwt>(userApi));
-
+             
             _logger.LogInformation($"Пользователь API {user.Email} вошел в систему, токен был сгенерирован");
 
             return jwtToken;
@@ -72,6 +72,7 @@ namespace WebApiMyFinances.Core.Services
                 Password = hashedPassword,
                 RoleId = role.Id
             };
+
             await _databaseContext.ApiUsers.AddAsync(newUser, cancellationToken);
             await _databaseContext.SaveChangesAsync(cancellationToken);
 

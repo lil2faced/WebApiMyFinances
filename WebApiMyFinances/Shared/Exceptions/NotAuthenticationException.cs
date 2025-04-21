@@ -4,7 +4,6 @@
     {
         public NotAuthenticationException(string message) : base(message)
         {
-
         }
     }
 }

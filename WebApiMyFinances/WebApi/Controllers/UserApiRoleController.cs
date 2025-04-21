@@ -19,6 +19,7 @@ namespace WebApiMyFinances.WebApi.Controllers
         {
             var cts = new CancellationTokenSource();
             var res = await _userApiRoleService.GetAllRoles(cts.Token);
+
             return Ok(res);
         }
 
@@ -27,6 +28,7 @@ namespace WebApiMyFinances.WebApi.Controllers
         {
             var cts = new CancellationTokenSource();
             await _userApiRoleService.SetRole(role, cts.Token);
+
             return Ok();
         }
 
@@ -35,6 +37,7 @@ namespace WebApiMyFinances.WebApi.Controllers
         {
             var cts = new CancellationTokenSource();
             await _userApiRoleService.EditRole(roleToEdit, role, cts.Token);
+
             return Ok();
         }
 
@@ -43,6 +46,7 @@ namespace WebApiMyFinances.WebApi.Controllers
         {
             var cts = new CancellationTokenSource();
             await _userApiRoleService.DeleteRole(role, cts.Token);
+
             return Ok();
         }
     }

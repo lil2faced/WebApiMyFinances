@@ -27,11 +27,12 @@ namespace WebApiMyFinances
                 .AddJwtBearer(options =>
                 {
                     string secretKey = configuration["AuthOptions:Key"] ??
-                            throw new Exception("Секретный ключ не определен");
+                        throw new Exception("Секретный ключ не определен");
                     string issuer = configuration["AuthOptions:Issuer"] ??
-                            throw new Exception("Секретный ключ не определен");
+                        throw new Exception("Секретный ключ не определен");
                     string audience = configuration["AuthOptions:Audience"] ??
-                            throw new Exception("Секретный ключ не определен");
+                        throw new Exception("Секретный ключ не определен");
+
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
@@ -42,11 +43,13 @@ namespace WebApiMyFinances
                         ValidIssuer = issuer,
                         ValidAudience = audience
                     };
+
                     options.Events = new JwtBearerEvents()
                     {
                         OnMessageReceived = context =>
                         {
                             context.Token = context.Request.Cookies["auth-token"];
+
                             return Task.CompletedTask;
                         }
                     };
@@ -56,8 +59,10 @@ namespace WebApiMyFinances
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
+
             builder.Services.AddSwaggerGen();
             builder.Services.AddAutoMapper(typeof(DefaultMappingProfile));
+
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             builder.Services.AddScoped<IUserApiService, UserApiService>();
             builder.Services.AddScoped<IJwtProvider, JwtProvider>();

@@ -21,6 +21,7 @@ namespace WebApiMyFinances.WebApi.Controllers
         {
             var cts = new CancellationTokenSource();
             DTOUserGet user = await _userService.GetUserByEmail(email, cts.Token);
+
             return Ok(user);
         }
 
@@ -29,6 +30,7 @@ namespace WebApiMyFinances.WebApi.Controllers
         {
             var cts = new CancellationTokenSource();
             var users = await _userService.GetAllUsers(cts.Token);
+
             return Ok(users);
         }
 
@@ -37,6 +39,7 @@ namespace WebApiMyFinances.WebApi.Controllers
         {
             var cts = new CancellationTokenSource();
             await _userService.SetUser(user, cts.Token);
+
             return Ok();
         }
 
@@ -45,6 +48,7 @@ namespace WebApiMyFinances.WebApi.Controllers
         {
             var cts = new CancellationTokenSource();
             await _userService.EditUser(email, user, cts.Token);
+
             return Ok();
         }
 
